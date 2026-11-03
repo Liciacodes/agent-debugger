@@ -38,6 +38,16 @@ The debugger needs real mistakes to catch, so don't "fix" these:
 ## Code I'm writing myself
 
 - `computeTotals` in `src/recorder/totals.ts` is mine. Don't change it or its tests unless I ask.
+- The `Step` model in `prisma/schema.prisma` is mine to design. Don't write it for me. When I say it's done, check it before any migration.
+
+## Database and server
+
+- Prisma 7.10 (pinned: npm's `latest` tag for `prisma` points at an 8.0 release candidate) + Postgres on Neon, set up like my ReviewPal project.
+  - `DATABASE_URL` (pooled) is used by the app through `@prisma/adapter-pg` (`src/server/db.ts`).
+  - `DIRECT_URL` (direct) is used by the Prisma command line for migrations (`prisma.config.ts`).
+  - Code that runs outside Next loads `.env.local` with `src/lib/env.ts` (`@next/env`, same rules as Next).
+  - The generated client is in `src/generated/prisma/` (git-ignored, made by `prisma generate`).
+- API: `POST /api/runs` needs the `x-recorder-token` header to match `RECORDER_TOKEN`; the GET routes are open (read-only). The logic is in `src/server/runs-api.ts`, tested with an in-memory store.
 
 ## Failure types seen in real runs
 
@@ -53,15 +63,20 @@ These become the debugger's automatic flags later:
 
 - The agent uses `openai/gpt-oss-120b`. Don't use the same Groq model as my Relay app, so runs here don't use up its daily token limit.
 - Real-model runs spend a shared daily limit, so don't run batches of them without asking me first.
-- `GROQ_API_KEY` lives in `.env.local` and is server-only. Never give it a `NEXT_PUBLIC_` prefix.
+- `GROQ_API_KEY` lives in `.env.local` and is server-only. Never give it a `NEXT_PUBLIC_` prefix. The same goes for `DATABASE_URL`, `DIRECT_URL` and `RECORDER_TOKEN`.
+- Migrations: this project has its own Neon database. Check it with `npx prisma migrate status` before migrating. Never reset it, and if a migration would drop or reset data, stop and ask me.
 - Saved runs must never contain the key. Every piece of text the recorder stores goes through its cleaning step, which hides keys and trims long text.
 - Every path a tool receives goes through `src/agent/tools/safe-path.ts`. Tools can't reach anything outside `sample-project/`.
 - Keep Next's default config files, with no `"type": "module"` in `package.json`.
 
 ## Commands
 
-- `npm run agent -- "your question"` runs the practice agent and saves the run to `runs/<id>.json`
+- `npm run dev` starts the server on http://localhost:3000
+- `npm run agent -- "your question"` runs the practice agent, saves the run to `runs/<id>.json`, then sends it to the server
 - `npm run runs` lists saved runs, newest first
 - `npm run show -- <id>` prints one saved run as a tree with timings
+- `npm run import` sends every run in `runs/` to the server (it must be running); runs it already has are skipped
+- `npm run db:migrate -- --name <what_changed>` creates and applies a migration, then run `npm run db:generate` (Prisma 7's `migrate dev` doesn't regenerate the client)
+- `npm run db:studio` browses the database in the browser
 - `npm test` runs our own tests, with no API key needed
 - `npm run test:sample` runs the sample project's tests (1 failure is expected)

@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // The practice agent's own project, checked by nothing but its tests.
     "sample-project/**",
+    // Made by `prisma generate`.
+    "src/generated/**",
   ]),
 ]);
 

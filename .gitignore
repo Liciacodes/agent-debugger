@@ -24,6 +24,9 @@
 # saved agent runs
 /runs/
 
+# Prisma client, made by `prisma generate`
+/src/generated/
+
 # misc
 .DS_Store
 *.pem

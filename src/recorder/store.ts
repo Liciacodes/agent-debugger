@@ -1,13 +1,10 @@
 import { randomBytes } from "node:crypto";
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { RUN_ID_PATTERN } from "./run-id";
 import type { Run } from "./types";
 
 export const RUNS_DIR = path.join(process.cwd(), "runs");
-
-// An id becomes part of a file name, so anything else, like "../.env.local",
-// is refused before it gets near the disk.
-const RUN_ID_PATTERN = /^run_[0-9a-f]{8}$/;
 
 export interface RunList {
   runs: Run[];

@@ -10,23 +10,36 @@
     "agent": "tsx --conditions=react-server src/agent/cli.ts",
     "runs": "tsx src/recorder/runs-cli.ts",
     "show": "tsx src/recorder/show-cli.ts",
+    "import": "tsx src/recorder/import-cli.ts",
     "test": "vitest run",
-    "test:sample": "vitest run --root sample-project"
+    "test:sample": "vitest run --root sample-project",
+    "db:migrate": "prisma migrate dev",
+    "db:generate": "prisma generate",
+    "db:studio": "prisma studio",
+    "migrate:deploy": "prisma migrate deploy",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@next/env": "^16.4.4",
+    "@prisma/adapter-pg": "^7.10.1",
+    "@prisma/client": "^7.10.1",
     "groq-sdk": "^1.6.0",
     "next": "16.4.4",
+    "pg": "^8.23.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "server-only": "^0.0.1"
+    "server-only": "^0.0.1",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^22.20.5",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.4",
+    "prisma": "^7.10.1",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
     "typescript": "^5",

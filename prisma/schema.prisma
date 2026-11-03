@@ -1,0 +1,66 @@
+// Agent debugger data model.
+// Connection URLs live in prisma.config.ts (command line) and src/server/db.ts
+// (app), not here (Prisma 7).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum RunStatus {
+  running
+  answered
+  max_rounds
+  cut_off
+  model_error
+}
+
+
+model Run {
+  id            String    @id
+  question      String    @db.Text
+  model         String
+  promptVersion String
+  startedAt     DateTime
+  status        RunStatus
+  answer        String?   @db.Text // kept whole, so it can be long
+  error         String?   @db.Text
+  createdAt     DateTime  @default(now()) // when the server stored it
+  steps      Step[]    
+
+  @@index([startedAt]) // newest runs first: Postgres can read an index from either end
+}
+
+
+enum StepType {
+  model
+  tool
+  answer
+}
+
+model Step {
+  runId      String
+  position   Int
+  id         String
+  parentId   String?
+  type       StepType
+  name       String
+  round      Int
+  startMs    Int
+  durationMs Int
+  tokens     Int?
+  input      String?  @db.Text
+  output     String?  @db.Text
+  reasoning  String?  @db.Text
+  ok         Boolean
+  error      String?  @db.Text
+
+  run Run @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@id([runId, id])
+  @@index([runId, position])
+}

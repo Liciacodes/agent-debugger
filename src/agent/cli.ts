@@ -1,6 +1,8 @@
 import path from "node:path";
+import { loadEnvFiles } from "../lib/env";
 import { countLabel, formatDuration, formatTokens } from "../lib/format";
 import { createRecorder } from "../recorder/recorder";
+import { DEFAULT_RECORDER_URL, describeSendResult, sendRun } from "../recorder/send";
 import { newRunId, saveRun } from "../recorder/store";
 import { createGroqModel, MODEL } from "./model";
 import { PROMPT_VERSION } from "./prompt";
@@ -54,15 +56,6 @@ function printStep(step: AgentStep): void {
   }
 }
 
-function loadEnvFile(): void {
-  try {
-    process.loadEnvFile(".env.local");
-  } catch (error) {
-    // No file is fine here: createGroqModel explains what's missing.
-    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
-  }
-}
-
 async function main(): Promise<number> {
   const question = process.argv.slice(2).join(" ").trim();
 
@@ -71,7 +64,8 @@ async function main(): Promise<number> {
     return 1;
   }
 
-  loadEnvFile();
+  // A missing .env.local is fine here: createGroqModel explains what's missing.
+  loadEnvFiles();
 
   const recorder = createRecorder({
     id: newRunId(),
@@ -92,9 +86,14 @@ async function main(): Promise<number> {
     },
   });
 
+  // The file is saved first, as a backup if the server isn't running.
   const run = recorder.getRun();
   await saveRun(run);
   console.log(`saved ${run.id}  (npm run show -- ${run.id})`);
+
+  const url = process.env.RECORDER_URL || DEFAULT_RECORDER_URL;
+  const sent = await sendRun(run, { url, token: process.env.RECORDER_TOKEN });
+  console.log(describeSendResult(sent, url));
 
   return result.status === "answered" ? 0 : 1;
 }
