@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Graphite v3</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Inter+Tight:wght@500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#08080A}
+a{color:#BDB4FC}a:hover{color:#DAD5FE}
+button{font-family:inherit;cursor:pointer}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</helmet>
+<div style="min-height: 960px; box-sizing: border-box; background: #08080A; color: #EDEEF1; font-family: Inter, system-ui, sans-serif; font-size: 13px; display: flex; flex-direction: column">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; height: 52px; box-sizing: border-box; padding: 0 16px; border-bottom: 1px solid #18191D">
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="width: 26px; height: 26px; border-radius: 8px; background: #EDEEF1; display: inline-flex; align-items: center; justify-content: center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#08080A" stroke-width="2.4" aria-hidden="true"><path d="M5 7h9M5 12h14M5 17h6"></path></svg></span>
+<span style="font-family: 'Inter Tight', Inter, sans-serif; font-weight: 700; font-size: 14px; letter-spacing: -0.01em">[Name]</span>
+<span style="color: #3A3B42">/</span>
+<span style="color: #B4B7BE">code-helper</span>
+<span style="padding: 2px 7px; border-radius: 5px; background: #121318; border: 1px solid #1E1F25; color: #8F939C; font-size: 11px">local</span>
+</div>
+<button type="button" style="flex: 0 1 380px; display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; border-radius: 8px; border: 1px solid #1E1F25; background: #0E0E11; color: #8F939C; font-size: 12.5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>Jump to a run, step or tool<span style="margin-left: auto; padding: 1px 6px; border-radius: 4px; background: #17181D; color: #A4A8B0; font-size: 11px">Ctrl K</span></button>
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="display: inline-flex; align-items: center; gap: 8px; color: #B4B7BE; font-size: 12.5px"><span style="display: inline-flex; gap: 2px"><span style="width: 4px; height: 12px; border-radius: 1px; background: #52C893"></span><span style="width: 4px; height: 12px; border-radius: 1px; background: #52C893"></span><span style="width: 4px; height: 12px; border-radius: 1px; background: #52C893"></span><span style="width: 4px; height: 12px; border-radius: 1px; background: #52C893"></span><span style="width: 4px; height: 12px; border-radius: 1px; background: #52C893"></span><span style="width: 4px; height: 12px; border-radius: 1px; background: #52C893"></span><span style="width: 4px; height: 12px; border-radius: 1px; background: #52C893"></span><span style="width: 4px; height: 12px; border-radius: 1px; background: #52C893"></span><span style="width: 4px; height: 12px; border-radius: 1px; background: #52C893"></span><span style="width: 4px; height: 12px; border-radius: 1px; background: #F26368"></span></span>9 of 10 tests</span>
+<button type="button" style="display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 8px; border: none; background: #EDEEF1; color: #08080A; font-size: 12.5px; font-weight: 600"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4l12 8-12 8z"></path></svg>Run all</button>
+</div>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto; min-height: 0">
+
+<nav aria-label="Sections" style="flex: 0 0 56px; box-sizing: border-box; border-right: 1px solid #18191D; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px">
+<button type="button" aria-label="Runs" style="width: 40px; height: 40px; border-radius: 10px; border: 1px solid #26232F; background: #15141B; color: #EDEEF1; display: inline-flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"></path></svg></button>
+<button type="button" aria-label="Tests" style="width: 40px; height: 40px; border-radius: 10px; border: none; background: transparent; color: #7E828B; display: inline-flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 11l3 3 8-8"></path><path d="M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"></path></svg></button>
+<button type="button" aria-label="Compare" style="width: 40px; height: 40px; border-radius: 10px; border: none; background: transparent; color: #7E828B; display: inline-flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="7" height="16" rx="2"></rect><rect x="14" y="4" width="7" height="16" rx="2"></rect></svg></button>
+<button type="button" aria-label="Prompts" style="width: 40px; height: 40px; border-radius: 10px; border: none; background: transparent; color: #7E828B; display: inline-flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z"></path><path d="M14 3v6h6M8 13h8M8 17h5"></path></svg></button>
+</nav>
+
+<aside style="flex: 1 1 250px; max-width: 280px; box-sizing: border-box; border-right: 1px solid #18191D; padding: 16px 10px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; padding: 0 6px">
+<h2 style="margin: 0; font-family: 'Inter Tight', Inter, sans-serif; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Runs</h2>
+<span style="color: #8F939C; font-size: 12px">24 today</span>
+</div>
+<div style="display: flex; gap: 6px; padding: 0 6px">
+<button type="button" style="height: 26px; padding: 0 10px; border-radius: 999px; border: 1px solid #2A2B33; background: #17181D; color: #EDEEF1; font-size: 12px">All</button>
+<button type="button" style="height: 26px; padding: 0 10px; border-radius: 999px; border: 1px solid #1E1F25; background: transparent; color: #A4A8B0; font-size: 12px">Failed · 2</button>
+<button type="button" style="height: 26px; padding: 0 10px; border-radius: 999px; border: 1px solid #1E1F25; background: transparent; color: #A4A8B0; font-size: 12px">Slow · 1</button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<button type="button" style="text-align: left; padding: 11px 10px; border-radius: 10px; border: none; background: #131318; color: #EDEEF1; display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 8px; align-items: start">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F26368" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M15 9l-6 6M9 9l6 6"></path></svg>
+<span style="display: flex; flex-direction: column; gap: 4px; min-width: 0"><span style="font-weight: 500; line-height: 1.35">Do the tests pass after my change?</span><span style="color: #8F939C; font-size: 11.5px">3.4s · 6 steps</span></span>
+<span style="color: #8F939C; font-size: 11.5px">2m</span>
+</button>
+<button type="button" style="text-align: left; padding: 11px 10px; border-radius: 10px; border: none; background: transparent; color: #EDEEF1; display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 8px; align-items: start">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#52C893" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l3 3 5-6"></path></svg>
+<span style="display: flex; flex-direction: column; gap: 4px"><span style="line-height: 1.35">Where is the login function?</span><span style="color: #8F939C; font-size: 11.5px">2.1s · 4 steps</span></span>
+<span style="color: #8F939C; font-size: 11.5px">9m</span>
+</button>
+<button type="button" style="text-align: left; padding: 11px 10px; border-radius: 10px; border: none; background: transparent; color: #EDEEF1; display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 8px; align-items: start">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E9B949" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+<span style="display: flex; flex-direction: column; gap: 4px"><span style="line-height: 1.35">Why is calculateTotal wrong?</span><span style="color: #8F939C; font-size: 11.5px">9.8s · 14 steps · slow</span></span>
+<span style="color: #8F939C; font-size: 11.5px">21m</span>
+</button>
+<button type="button" style="text-align: left; padding: 11px 10px; border-radius: 10px; border: none; background: transparent; color: #EDEEF1; display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 8px; align-items: start">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#52C893" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l3 3 5-6"></path></svg>
+<span style="display: flex; flex-direction: column; gap: 4px"><span style="line-height: 1.35">List the files in src</span><span style="color: #8F939C; font-size: 11.5px">0.9s · 2 steps</span></span>
+<span style="color: #8F939C; font-size: 11.5px">1h</span>
+</button>
+<button type="button" style="text-align: left; padding: 11px 10px; border-radius: 10px; border: none; background: transparent; color: #EDEEF1; display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 8px; align-items: start">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F26368" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M15 9l-6 6M9 9l6 6"></path></svg>
+<span style="display: flex; flex-direction: column; gap: 4px"><span style="line-height: 1.35">Fix the failing cart test</span><span style="color: #8F939C; font-size: 11.5px">5.2s · 9 steps</span></span>
+<span style="color: #8F939C; font-size: 11.5px">2h</span>
+</button>
+</div>
+</aside>
+
+<main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: 24px 28px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 14px">
+<div style="display: flex; gap: 14px; align-items: flex-start">
+<span style="width: 40px; height: 40px; flex: none; border-radius: 11px; background: #1E1215; border: 1px solid #3A1D22; display: inline-flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F26368" stroke-width="2.2" aria-hidden="true"><path d="M15 9l-6 6M9 9l6 6"></path></svg></span>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h1 style="margin: 0; font-family: 'Inter Tight', Inter, sans-serif; font-size: 24px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Do the tests pass after my change?</h1>
+<span style="color: #8F939C; font-size: 12.5px">Failed 1 of 3 checks · 3.40s · 3,512 tokens · <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px">run_8f2a</span></span>
+</div>
+</div>
+<div style="display: flex; gap: 2px; padding: 3px; border-radius: 9px; background: #0E0E11; border: 1px solid #1C1D22">
+<button type="button" style="height: 28px; padding: 0 12px; border-radius: 6px; border: none; background: #1B1C21; color: #EDEEF1; font-size: 12.5px; font-weight: 500">Timeline</button>
+<button type="button" style="height: 28px; padding: 0 12px; border-radius: 6px; border: none; background: transparent; color: #A4A8B0; font-size: 12.5px">Compare</button>
+<button type="button" style="height: 28px; padding: 0 12px; border-radius: 6px; border: none; background: transparent; color: #A4A8B0; font-size: 12.5px">Raw</button>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<span style="display: inline-flex; align-items: center; gap: 7px; height: 28px; padding: 0 11px; border-radius: 999px; background: #0E1611; border: 1px solid #1D3326; color: #A9E5C6; font-size: 12px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#52C893" stroke-width="2.8" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>Names the file it read</span>
+<span style="display: inline-flex; align-items: center; gap: 7px; height: 28px; padding: 0 11px; border-radius: 999px; background: #1A0F11; border: 1px solid #3E1F24; color: #FFB3B6; font-size: 12px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F26368" stroke-width="2.8" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>Runs tests before saying they pass</span>
+<span style="display: inline-flex; align-items: center; gap: 7px; height: 28px; padding: 0 11px; border-radius: 999px; background: #0E1611; border: 1px solid #1D3326; color: #A9E5C6; font-size: 12px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#52C893" stroke-width="2.8" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>Under 5 seconds</span>
+</div>
+
+<div style="border: 1px solid #1C1D22; border-radius: 14px; background: #0B0B0E; overflow: hidden">
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 16px; padding: 10px 16px; border-bottom: 1px solid #18191D; color: #8F939C; font-size: 11.5px; font-variant-numeric: tabular-nums">
+<span>6 steps</span>
+<span style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) auto"><span>0s</span><span>1s</span><span>2s</span><span>3.4s</span></span>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 16px; align-items: center; height: 40px; padding: 0 16px">
+<span style="display: flex; align-items: center; gap: 9px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8F939C" stroke-width="2.4" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg><span style="font-weight: 500">Run</span></span>
+<span style="position: relative; height: 22px; background-image: linear-gradient(90deg, #17181C 1px, transparent 1px); background-size: 29.4% 100%"><span style="position: absolute; left: 0; width: 100%; top: 9px; height: 4px; border-radius: 2px; background: #2A2B32"></span></span>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 16px; align-items: center; height: 40px; padding: 0 16px">
+<span style="display: flex; align-items: center; gap: 9px; padding-left: 21px"><span style="width: 8px; height: 8px; border-radius: 2px; background: #A497FA"></span><span>Plan next step</span><span style="color: #8F939C; font-size: 11.5px">1.4k tok</span></span>
+<span style="position: relative; height: 22px; background-image: linear-gradient(90deg, #17181C 1px, transparent 1px); background-size: 29.4% 100%"><span style="position: absolute; left: 0%; width: 24%; top: 5px; height: 12px; border-radius: 4px; background: #A497FA"></span><span style="position: absolute; left: 25.5%; top: 3px; color: #A4A8B0; font-size: 11.5px; font-variant-numeric: tabular-nums">0.82s</span></span>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 16px; align-items: center; height: 40px; padding: 0 16px">
+<span style="display: flex; align-items: center; gap: 9px; padding-left: 42px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #D6D8DD"><span style="width: 8px; height: 8px; border-radius: 50%; background: #5AA9F8"></span>list_files</span>
+<span style="position: relative; height: 22px; background-image: linear-gradient(90deg, #17181C 1px, transparent 1px); background-size: 29.4% 100%"><span style="position: absolute; left: 25%; width: 2%; top: 5px; height: 12px; border-radius: 4px; background: #5AA9F8"></span><span style="position: absolute; left: 28.5%; top: 3px; color: #A4A8B0; font-size: 11.5px; font-variant-numeric: tabular-nums">60ms</span></span>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 16px; align-items: center; height: 40px; padding: 0 16px">
+<span style="display: flex; align-items: center; gap: 9px; padding-left: 42px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #D6D8DD"><span style="width: 8px; height: 8px; border-radius: 50%; background: #5AA9F8"></span>read_file <span style="color: #8F939C">src/cart.ts</span></span>
+<span style="position: relative; height: 22px; background-image: linear-gradient(90deg, #17181C 1px, transparent 1px); background-size: 29.4% 100%"><span style="position: absolute; left: 28%; width: 2%; top: 5px; height: 12px; border-radius: 4px; background: #5AA9F8"></span><span style="position: absolute; left: 31.5%; top: 3px; color: #A4A8B0; font-size: 11.5px; font-variant-numeric: tabular-nums">70ms</span></span>
+</div>
+
+<div style="background: #121117; border-top: 1px solid #221F2E; border-bottom: 1px solid #221F2E">
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 16px; align-items: center; height: 40px; padding: 0 16px">
+<span style="display: flex; align-items: center; gap: 9px; padding-left: 21px"><span style="width: 8px; height: 8px; border-radius: 2px; background: #A497FA"></span><span style="font-weight: 600">Decide</span><span style="color: #8F939C; font-size: 11.5px">2.1k tok</span></span>
+<span style="position: relative; height: 22px; background-image: linear-gradient(90deg, #1B1A22 1px, transparent 1px); background-size: 29.4% 100%"><span style="position: absolute; left: 31%; width: 32%; top: 5px; height: 12px; border-radius: 4px; background: #BDB4FC; box-shadow: 0 0 0 3px rgba(164,151,250,0.18)"></span><span style="position: absolute; left: 64.5%; top: 3px; color: #EDEEF1; font-size: 11.5px; font-weight: 500; font-variant-numeric: tabular-nums">1.10s</span></span>
+</div>
+<div style="margin: 0 16px 14px 46px; padding: 12px 14px; border-radius: 10px; background: #0B0B0E; border: 1px solid #1E1D27; display: flex; flex-direction: column; gap: 8px">
+<span style="color: #8F939C; font-size: 11.5px">Model replied with no tool call</span>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #FFC2C4">"All tests pass after your change."</span>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 16px; align-items: center; height: 40px; padding: 0 16px">
+<span style="display: flex; align-items: center; gap: 9px; padding-left: 42px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #F2CF78"><span style="width: 8px; height: 8px; border-radius: 50%; border: 1.5px dashed #E9B949; box-sizing: border-box"></span>run_tests <span style="font-family: Inter, sans-serif; color: #C9A44A; font-size: 11.5px">expected · never called</span></span>
+<span style="position: relative; height: 22px; background-image: linear-gradient(90deg, #17181C 1px, transparent 1px); background-size: 29.4% 100%"><span style="position: absolute; left: 63%; width: 13%; top: 5px; height: 12px; border-radius: 4px; border: 1.5px dashed #E9B949; box-sizing: border-box"></span></span>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 16px; align-items: center; height: 40px; padding: 0 16px">
+<span style="display: flex; align-items: center; gap: 9px; padding-left: 21px"><span style="width: 8px; height: 8px; border-radius: 2px; background: #F26368"></span><span>Answer</span><span style="color: #FF9A9E; font-size: 11.5px">incorrect</span></span>
+<span style="position: relative; height: 22px; background-image: linear-gradient(90deg, #17181C 1px, transparent 1px); background-size: 29.4% 100%"><span style="position: absolute; left: 64%; width: 36%; top: 5px; height: 12px; border-radius: 4px; background: #5B5E66"></span></span>
+</div>
+</div>
+</main>
+
+<aside style="flex: 1 1 340px; max-width: 400px; box-sizing: border-box; border-left: 1px solid #18191D; padding: 24px 22px; display: flex; flex-direction: column; gap: 20px; background: #0A0A0D">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="color: #8F939C; font-size: 12px">Step 4 · model call</span>
+<h2 style="margin: 0; font-family: 'Inter Tight', Inter, sans-serif; font-size: 18px; font-weight: 600; letter-spacing: -0.015em">Fix and replay</h2>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="color: #8F939C; font-size: 12px">What went wrong</span>
+<p style="margin: 0; color: #D6D8DD; line-height: 1.6">The model had <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #F2CF78">run_tests</span> available, never called it, and still said the tests pass.</p>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<span style="color: #8F939C; font-size: 12px">System prompt · v3 to v4</span>
+<button type="button" style="height: 26px; padding: 0 9px; border-radius: 6px; border: 1px solid #23242B; background: transparent; color: #B4B7BE; font-size: 12px">Edit</button>
+</div>
+<pre style="margin: 0; padding: 12px 0; border-radius: 10px; background: #0E0E11; border: 1px solid #1C1D22; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.75; color: #9CA0A8; white-space: pre-wrap"><span style="display: block; padding: 0 12px">You are a careful coding assistant.</span><span style="display: block; padding: 0 12px">Use the tools before you answer.</span><span style="display: block; padding: 0 12px; background: #0E1A13; color: #A9E5C6">+ Never say tests pass unless run_tests</span><span style="display: block; padding: 0 12px; background: #0E1A13; color: #A9E5C6">+ ran in this conversation.</span></pre>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="color: #8F939C; font-size: 12px">Replay mode</span>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<button type="button" style="text-align: left; padding: 11px 12px; border-radius: 10px; border: 1px solid #3A3460; background: #131220; color: #EDEEF1; display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 10px; align-items: start"><span style="width: 14px; height: 14px; margin-top: 1px; border-radius: 50%; border: 4px solid #A497FA; box-sizing: border-box"></span><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 500">Live</span><span style="color: #A4A8B0; font-size: 12px; line-height: 1.45">Tools run again on today's code</span></span></button>
+<button type="button" style="text-align: left; padding: 11px 12px; border-radius: 10px; border: 1px solid #1E1F25; background: transparent; color: #EDEEF1; display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 10px; align-items: start"><span style="width: 14px; height: 14px; margin-top: 1px; border-radius: 50%; border: 1.5px solid #4A4C55; box-sizing: border-box"></span><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 500">From recording</span><span style="color: #A4A8B0; font-size: 12px; line-height: 1.45">Reuse the saved tool results, only the model runs</span></span></button>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px; margin-top: auto">
+<button type="button" style="height: 42px; border-radius: 10px; border: none; background: #A497FA; color: #120F25; font-size: 13.5px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path></svg>Replay from step 4</button>
+<button type="button" style="height: 42px; border-radius: 10px; border: 1px solid #23242B; background: transparent; color: #EDEEF1; font-size: 13.5px">Save as a test</button>
+</div>
+</aside>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":960}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
