@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { trimText } from "../recorder/recorder";
 import type { Run, Step } from "../recorder/types";
 import { barFor, buildRows, stepLabel, stepNote, timeAxis, toolDetail } from "./waterfall";
 
@@ -108,8 +109,8 @@ describe("toolDetail", () => {
 
 describe("stepNote", () => {
   it("says what the chosen step did", () => {
-    expect(stepNote(steps[0], steps).label).toBe("Model asked for 1 tool");
-    expect(stepNote(steps[2], steps)).toEqual({
+    expect(stepNote(steps[0], steps, null).label).toBe("Model asked for 1 tool");
+    expect(stepNote(steps[2], steps, null)).toEqual({
       label: "Model replied with no tool call",
       text: "One test fails.",
     });
@@ -118,7 +119,23 @@ describe("stepNote", () => {
   it("shows the error of a failed tool", () => {
     const failed = { ...steps[1], ok: false, error: "Path not allowed." };
 
-    expect(stepNote(failed, steps)).toEqual({ label: "The tool returned an error", text: "Path not allowed." });
+    expect(stepNote(failed, steps, null)).toEqual({ label: "The tool returned an error", text: "Path not allowed." });
+  });
+
+  it("explains Groq refusing a tool call, even when the step's copy was cut short", () => {
+    const runError = `400 ${JSON.stringify({
+      error: {
+        message: "attempted to call tool 'write_file' which was not in request.tools",
+        code: "tool_use_failed",
+        failed_generation: JSON.stringify({ name: "write_file", arguments: { patch: "x".repeat(3_000) } }),
+      },
+    })}`;
+    const failed = { ...steps[2], ok: false, error: trimText(runError) };
+
+    expect(stepNote(failed, steps, runError)).toEqual({
+      label: "The model call failed",
+      text: "The model tried to call write_file, a tool it doesn't have.",
+    });
   });
 });
 

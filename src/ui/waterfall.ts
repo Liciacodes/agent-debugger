@@ -1,6 +1,7 @@
 import { formatDuration } from "../lib/format";
 import { depthOf } from "../recorder/tree";
 import type { Run, Step } from "../recorder/types";
+import { readToolUseFailure, wholeStepError } from "./errors";
 
 // Narrower than this and a bar would vanish, so very short steps get at least
 // this much width.
@@ -107,9 +108,15 @@ function shorten(text: string | null): string | null {
 }
 
 // The short box under the chosen row: what happened, plus a peek at the text.
-export function stepNote(step: Step, steps: Step[]): { label: string; text: string | null } {
+// A Groq tool error gets its plain sentence instead of the start of its JSON.
+export function stepNote(step: Step, steps: Step[], runError: string | null): { label: string; text: string | null } {
   if (!step.ok) {
-    return { label: step.type === "tool" ? "The tool returned an error" : "The model call failed", text: shorten(step.error) };
+    const error = wholeStepError(step.error, runError);
+    const failure = error === null ? null : readToolUseFailure(error);
+    return {
+      label: step.type === "tool" ? "The tool returned an error" : "The model call failed",
+      text: shorten(failure?.summary ?? error),
+    };
   }
 
   switch (step.type) {

@@ -17,8 +17,9 @@ const LABEL_FLIP_PERCENT = 85;
 interface WaterfallProps {
   rows: WaterfallRow[];
   axis: TimeAxis;
-  chosenId: string | null; 
+  chosenId: string | null;
   onChoose: (id: string | null) => void;
+  runError: string | null; // the whole error, for a step whose copy was cut short
 }
 
 const BAR_COLOURS: Record<Step["type"], string> = {
@@ -55,6 +56,7 @@ function durationLabelStyle(bar: Bar): CSSProperties {
 function StepRow({
   row,
   steps,
+  runError,
   axis,
   chosen,
   onChoose,
@@ -62,6 +64,7 @@ function StepRow({
 }: {
   row: WaterfallRow;
   steps: Step[];
+  runError: string | null;
   axis: TimeAxis;
   chosen: boolean;
   onChoose: (id: string) => void;
@@ -70,7 +73,7 @@ function StepRow({
   const { step, bar } = row;
   const isTool = step.type === "tool";
   const barColour = !step.ok ? "bg-bad" : chosen && step.type === "model" ? "bg-model-strong" : BAR_COLOURS[step.type];
-  const note = chosen ? stepNote(step, steps) : null;
+  const note = chosen ? stepNote(step, steps, runError) : null;
   const indent = INDENT_PX * (row.depth + 1);
 
   return (
@@ -131,7 +134,7 @@ function StepRow({
   );
 }
 
-export function Waterfall({ rows, axis, chosenId, onChoose }: WaterfallProps) {
+export function Waterfall({ rows, axis, chosenId, onChoose, runError }: WaterfallProps) {
   const steps = rows.map((row) => row.step);
   // The buttons in order, Run row first, so the arrow keys can move between them.
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
@@ -194,6 +197,7 @@ export function Waterfall({ rows, axis, chosenId, onChoose }: WaterfallProps) {
             key={row.step.id}
             row={row}
             steps={steps}
+            runError={runError}
             axis={axis}
             chosen={row.step.id === chosenId}
             onChoose={onChoose}

@@ -2,9 +2,14 @@ import type { ReactNode } from "react";
 import { formatDuration } from "@/lib/format";
 import type { RunTotals } from "@/recorder/totals";
 import type { Run } from "@/recorder/types";
+import { readToolUseFailure, type ToolUseFailure, wholeStepError } from "@/ui/errors";
 import { fullTokens, statusLabel } from "@/ui/labels";
 import { stepKind, type WaterfallRow } from "@/ui/waterfall";
 import { FormattedText } from "./FormattedText";
+
+// The box every block of saved text sits in. Each use adds its colours.
+const TEXT_BOX =
+  "scrollbar-dark max-h-80 overflow-auto rounded-[10px] border px-3 py-2.5 font-mono text-xs leading-[1.7] whitespace-pre-wrap wrap-break-word";
 
 // Tool arguments arrive as one line of JSON; spread them out to read.
 function readableJson(text: string): string {
@@ -57,7 +62,7 @@ function TextBlock({
     <section className="flex flex-col gap-2">
       <h3 className="text-xs text-muted">{title}</h3>
       <pre
-        className={`scrollbar-dark max-h-80 overflow-auto rounded-[10px] border px-3 py-2.5 font-mono text-xs leading-[1.7] whitespace-pre-wrap wrap-break-word ${
+        className={`${TEXT_BOX} ${
           tone === "bad" ? "border-bad-edge bg-bad-tint text-bad-soft" : "border-edge bg-field text-fg-soft"
         }`}
       >
@@ -67,8 +72,66 @@ function TextBlock({
   );
 }
 
-export function StepDetails({ row }: { row: WaterfallRow }) {
+// A section that stays closed until its title is clicked.
+function Fold({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <details className="flex flex-col gap-2">
+      <summary className="cursor-pointer text-xs text-muted hover:text-fg">{title}</summary>
+      <div className="mt-2">{children}</div>
+    </details>
+  );
+}
+
+function ToolAttempt({ failure }: { failure: ToolUseFailure }) {
+  return (
+    <dl className="flex flex-col gap-3">
+      {failure.tool !== null && (
+        <Fact label="Tool">
+          <span className="font-mono text-xs break-all">{failure.tool}</span>
+        </Fact>
+      )}
+      {failure.args?.length === 0 && <Fact label="Arguments">None</Fact>}
+      {failure.args?.map((arg) => (
+        <Fact key={arg.name} label={arg.name}>
+          <pre className={`${TEXT_BOX} mt-1 border-edge bg-field text-fg-soft`}>{arg.value}</pre>
+        </Fact>
+      ))}
+      {failure.sent !== null && (
+        <Fact label="Exactly as sent">
+          <pre className={`${TEXT_BOX} mt-1 border-edge bg-field text-fg-soft`}>{failure.sent}</pre>
+        </Fact>
+      )}
+    </dl>
+  );
+}
+
+// Groq's tool_use_failed error is a wall of JSON, so it's explained in one
+// sentence, with the details folded away. Other errors are shown as they are.
+function ErrorBlock({ text }: { text: string }) {
+  const failure = readToolUseFailure(text);
+  if (!failure) return <TextBlock title="Error" text={text} tone="bad" />;
+
+  return (
+    <section className="flex flex-col gap-2">
+      <h3 className="text-xs text-muted">Error</h3>
+      <p className="rounded-[10px] border border-bad-edge bg-bad-tint px-3 py-2.5 leading-relaxed text-bad-soft">
+        {failure.summary}
+      </p>
+      {(failure.args !== null || failure.sent !== null) && (
+        <Fold title="What it tried to send">
+          <ToolAttempt failure={failure} />
+        </Fold>
+      )}
+      <Fold title="Full error from Groq">
+        <pre className={`${TEXT_BOX} border-bad-edge bg-bad-tint text-bad-soft`}>{text}</pre>
+      </Fold>
+    </section>
+  );
+}
+
+export function StepDetails({ row, runError }: { row: WaterfallRow; runError: string | null }) {
   const { step } = row;
+  const error = wholeStepError(step.error, runError);
 
   return (
     <div className="flex flex-col gap-5">
@@ -86,7 +149,7 @@ export function StepDetails({ row }: { row: WaterfallRow }) {
         </Fact>
       </dl>
 
-      {step.error && <TextBlock title="Error" text={step.error} tone="bad" />}
+      {error && <ErrorBlock text={error} />}
       {step.input && (
         <TextBlock
           title={step.type === "tool" ? "Arguments" : "Input (what was new to the model)"}
@@ -95,12 +158,9 @@ export function StepDetails({ row }: { row: WaterfallRow }) {
       )}
       {step.output && <TextBlock title={step.type === "answer" ? "Answer" : "Output"} text={step.output} />}
       {step.reasoning && (
-        <details className="group flex flex-col gap-2">
-          <summary className="cursor-pointer text-xs text-muted hover:text-fg">Reasoning</summary>
-          <pre className="scrollbar-dark mt-2 max-h-80 overflow-auto rounded-[10px] border border-edge bg-field px-3 py-2.5 font-mono text-xs leading-[1.7] whitespace-pre-wrap wrap-break-word text-fg-faint">
-            {step.reasoning}
-          </pre>
-        </details>
+        <Fold title="Reasoning">
+          <pre className={`${TEXT_BOX} border-edge bg-field text-fg-faint`}>{step.reasoning}</pre>
+        </Fold>
       )}
     </div>
   );
@@ -132,7 +192,7 @@ export function RunOverview({ run, totals }: { run: Run; totals: RunTotals }) {
       </dl>
 
       {run.answer !== null && <TextBlock title="Answer" text={run.answer} markdown />}
-      {run.error !== null && <TextBlock title="Error" text={run.error} tone="bad" />}
+      {run.error !== null && <ErrorBlock text={run.error} />}
       <p className="text-xs leading-relaxed text-muted">Pick a step in the timeline to see everything about it.</p>
     </div>
   );

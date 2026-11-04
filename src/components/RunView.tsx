@@ -4,6 +4,7 @@ import { useState } from "react";
 import { formatDuration } from "@/lib/format";
 import { computeTotals } from "@/recorder/totals";
 import type { Run } from "@/recorder/types";
+import { readToolUseFailure } from "@/ui/errors";
 import { fullTokens, statusLabel } from "@/ui/labels";
 import { buildRows, timeAxis } from "@/ui/waterfall";
 import { RawView } from "./RawView";
@@ -82,14 +83,16 @@ export function RunView({ run, stepFromUrl }: { run: Run; stepFromUrl: string | 
           <ViewSwitch value={view} onChange={setView} />
         </div>
 
+        {/* Only the plain sentence for a Groq tool error; the details panel
+            has the rest. */}
         {run.error && (
           <p role="status" className="rounded-[10px] border border-bad-edge bg-bad-tint px-3.5 py-2.5 leading-relaxed text-bad-soft">
-            {run.error}
+            {readToolUseFailure(run.error)?.summary ?? run.error}
           </p>
         )}
 
         {view === "timeline" ? (
-          <Waterfall rows={rows} axis={axis} chosenId={chosenId} onChoose={choose} />
+          <Waterfall rows={rows} axis={axis} chosenId={chosenId} onChoose={choose} runError={run.error} />
         ) : (
           <RawView run={run} />
         )}
@@ -99,7 +102,7 @@ export function RunView({ run, stepFromUrl }: { run: Run; stepFromUrl: string | 
         aria-label="Details"
         className="scrollbar-dark w-full border-t border-line bg-side px-4 py-6 sm:px-5.5 xl:w-95 xl:shrink-0 xl:overflow-y-auto xl:border-t-0 xl:border-l"
       >
-        {chosenRow ? <StepDetails row={chosenRow} /> : <RunOverview run={run} totals={totals} />}
+        {chosenRow ? <StepDetails row={chosenRow} runError={run.error} /> : <RunOverview run={run} totals={totals} />}
       </aside>
     </>
   );
