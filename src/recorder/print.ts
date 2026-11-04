@@ -1,5 +1,6 @@
 import { countLabel, formatDuration, formatTokens } from "../lib/format";
 import type { RunTotals } from "./totals";
+import { depthOf } from "./tree";
 import type { Run, Step } from "./types";
 
 const MAX_QUESTION_SHOWN = 60;
@@ -43,20 +44,6 @@ export function formatRunList(runs: Run[]): string {
       ].join("  "),
     )
     .join("\n");
-}
-
-// How many parents a step has. The limit stops a hand-edited file with a
-// parent loop from hanging the printer.
-function depthOf(step: Step, stepsById: Map<string, Step>): number {
-  let depth = 0;
-  let parentId = step.parentId;
-
-  while (parentId !== null && depth < 10) {
-    depth += 1;
-    parentId = stepsById.get(parentId)?.parentId ?? null;
-  }
-
-  return depth;
 }
 
 function describeStep(step: Step): string {

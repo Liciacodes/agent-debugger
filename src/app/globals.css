@@ -1,1 +1,96 @@
 @import "tailwindcss";
+
+/* The design's colours, from docs/design/graphite-v3.html, named once so every
+   component uses the same ones. Each becomes a Tailwind class, like bg-page,
+   text-muted or border-line. */
+@theme {
+  --color-page: #08080a;
+  --color-card: #0b0b0e; /* the waterfall card */
+  --color-side: #0a0a0d; /* the step details panel */
+  --color-field: #0e0e11; /* code blocks, the Timeline/Raw switch */
+  --color-raised: #131318; /* the open run in the list */
+  --color-chip: #17181d;
+  --color-line: #18191d;
+  --color-grid: #17181c;
+  --color-edge: #1c1d22;
+  --color-edge-strong: #1e1f25;
+  --color-chosen: #121117; /* the chosen waterfall row */
+  --color-chosen-line: #221f2e;
+  --color-chip-edge: #2a2b33; /* the active filter chip */
+  --color-nav: #15141b; /* the active icon in the left bar */
+  --color-nav-edge: #26232f;
+  --color-run-bar: #2a2b32;
+
+  --color-fg: #edeef1;
+  --color-fg-soft: #d6d8dd;
+  --color-fg-dim: #b4b7be;
+  --color-fg-faint: #a4a8b0;
+  --color-muted: #8f939c;
+  --color-quiet: #3a3b42;
+
+  --color-model: #a497fa; /* model calls */
+  --color-model-strong: #bdb4fc;
+  --color-tool: #5aa9f8; /* tool calls */
+  --color-answer: #5b5e66;
+  --color-ok: #52c893;
+  --color-ok-soft: #a9e5c6;
+  --color-ok-tint: #0e1611;
+  --color-ok-edge: #1d3326;
+  --color-bad: #f26368;
+  --color-bad-soft: #ffb3b6;
+  --color-bad-tint: #1e1215;
+  --color-bad-edge: #3a1d22;
+  --color-warn: #e9b949;
+  --color-warn-soft: #f2cf78; /* also inline code in text, like run_tests in the design */
+}
+
+/* Thin scrollbars in the theme's colours, instead of the system's light ones.
+   Chrome and Firefox use the first two lines; Safari uses the ::-webkit ones. */
+@utility scrollbar-dark {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-quiet) transparent;
+
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  &::-webkit-scrollbar-track,
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: var(--color-quiet) padding-box;
+  }
+}
+
+/* The fonts come from next/font in layout.tsx, as CSS variables. */
+@theme inline {
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-inter-tight), var(--font-inter), sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-page);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    font-size: 13px;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background-color: rgb(164 151 250 / 0.3);
+  }
+}

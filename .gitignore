@@ -27,6 +27,9 @@
 # Prisma client, made by `prisma generate`
 /src/generated/
 
+# screenshots and logs from browser checks
+/.playwright-mcp/
+
 # misc
 .DS_Store
 *.pem

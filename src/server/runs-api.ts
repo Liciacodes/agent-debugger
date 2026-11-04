@@ -7,15 +7,13 @@ import { describeProblems, runSchema } from "./run-schema";
 const MAX_BODY_BYTES = 1_000_000;
 export const RUN_LIST_LIMIT = 100;
 
-// Where runs are kept. The real one uses Postgres (prisma-store.ts); the tests
-// use one that keeps runs in memory.
+
 export interface RunStore {
-  // Saves a run with its steps, all or nothing. Returns false, and changes
-  // nothing, when a run with this id is already stored.
+ 
   addRun(run: Run): Promise<boolean>;
-  // Newest first, each with its steps.
+
   listRuns(limit: number): Promise<Run[]>;
-  // Steps in order, or null when there's no such run.
+  
   getRun(id: string): Promise<Run | null>;
 }
 
@@ -38,8 +36,7 @@ function errorResponse(status: number, error: string, problems?: string[]): Resp
   return Response.json(problems ? { error, problems } : { error }, { status });
 }
 
-// A database error can include details about the query, so only its message
-// goes to the server log, and the client gets a plain sentence.
+
 async function safely(what: string, action: () => Promise<Response>): Promise<Response> {
   try {
     return await action();
@@ -49,7 +46,8 @@ async function safely(what: string, action: () => Promise<Response>): Promise<Re
   }
 }
 
-function toSummary(run: Run): RunSummary {
+// One row of the runs list, used by GET /api/runs and the UI's sidebar.
+export function toSummary(run: Run): RunSummary {
   return {
     id: run.id,
     question: run.question,

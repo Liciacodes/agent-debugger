@@ -28,6 +28,11 @@ Not in v1: accounts, Python agent, AI explanations, cost analytics.
 
 The UI must follow `docs/design/graphite-v3.html`. It is a visual reference only (layout, colours, fonts, spacing). Ignore its `./support.js`, and build the UI properly rather than copying its markup.
 
+- Only show what works. Parts of the design that aren't built yet (Tests, Compare, Prompts, search, checks, replay) stay hidden until the day they're built.
+- The design's colours and fonts are named once in `src/app/globals.css` (like `bg-page`, `text-muted`, `bg-model`). Use those names, not raw hex values.
+- Components are in `src/components/`. Logic that can be a plain function (bar positions, labels, times) goes in `src/ui/`, with tests next to it.
+- Cache Components is on: anything that reads the database or the URL's params goes inside `<Suspense>` and calls `connection()` first. Pages read runs through `prismaStore`, not by calling our own API.
+
 ## Mistakes kept on purpose
 
 The debugger needs real mistakes to catch, so don't "fix" these:
