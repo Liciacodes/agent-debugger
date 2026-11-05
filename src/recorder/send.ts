@@ -2,8 +2,7 @@ import { RECORDER_TOKEN_HEADER } from "../server/recorder-token";
 import type { Run } from "./types";
 
 export const DEFAULT_RECORDER_URL = "http://localhost:3000";
-// Longer than the server's own wait for a sleeping database (10s), so a slow
-// first save isn't cut off by the CLI giving up first.
+
 const SEND_TIMEOUT_MS = 30_000;
 
 export type SendResult =

@@ -31,7 +31,7 @@ export function RawView({ run }: { run: Run }) {
       await navigator.clipboard.writeText(json);
       setCopyState("copied");
     } catch {
-      // The browser can refuse, for example on a page that isn't https.
+   
       setCopyState("failed");
     }
   }
@@ -40,7 +40,7 @@ export function RawView({ run }: { run: Run }) {
 
   return (
     <div className="relative">
-      {/* Outside the scrolling box, so it stays in the corner while you scroll. */}
+   
       <button
         type="button"
         onClick={copy}

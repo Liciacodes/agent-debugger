@@ -7,14 +7,14 @@ export interface Step {
   id: string; // "s1", "s2", ... in the order the steps started
   parentId: string | null; // null means the step sits directly under the run
   type: StepType;
-  name: string; // "model call", the tool's name, or "answer"
+  name: string; 
   round: number;
   startMs: number; // how long after the run started this step began
   durationMs: number;
   tokens: number | null; // model calls only
   input: string | null; // trimmed
   output: string | null; // trimmed
-  reasoning: string | null; // model calls only: the model's thinking, trimmed
+  reasoning: string | null;
   ok: boolean;
   error: string | null;
 }
