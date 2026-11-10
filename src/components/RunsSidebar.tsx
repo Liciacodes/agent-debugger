@@ -1,4 +1,5 @@
 import { connection } from "next/server";
+import { slowSteps } from "@/flags/rules";
 import type { Run } from "@/recorder/types";
 import { prismaStore } from "@/server/prisma-store";
 import { RUN_LIST_LIMIT, toSummary } from "@/server/runs-api";
@@ -24,7 +25,11 @@ export async function RunsSidebar() {
   // to read the current time.
   // eslint-disable-next-line react-hooks/purity
   const now = Date.now();
-  const items: RunListItem[] = runs.map((run) => ({ ...toSummary(run), ago: timeAgo(run.startedAt, now) }));
+  const items: RunListItem[] = runs.map((run) => ({
+    ...toSummary(run),
+    ago: timeAgo(run.startedAt, now),
+    slow: slowSteps(run).length > 0,
+  }));
   const todayCount = runs.filter((run) => isSameDay(run.startedAt, now)).length;
 
   return <RunList items={items} todayCount={todayCount} />;

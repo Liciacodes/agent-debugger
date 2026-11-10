@@ -19,7 +19,7 @@ interface WaterfallProps {
   axis: TimeAxis;
   chosenId: string | null;
   onChoose: (id: string | null) => void;
-  runError: string | null; // the whole error, for a step whose copy was cut short
+  runError: string | null; 
 }
 
 const BAR_COLOURS: Record<Step["type"], string> = {
@@ -29,13 +29,11 @@ const BAR_COLOURS: Record<Step["type"], string> = {
 };
 
 function Marker({ step }: { step: Step }) {
-  // Squares for model calls and the answer, dots for tools, like the design.
   const shape = step.type === "tool" ? "rounded-full" : "rounded-[2px]";
   const colour = !step.ok ? "bg-bad" : BAR_COLOURS[step.type];
   return <span className={`size-2 shrink-0 ${shape} ${colour}`} aria-hidden="true" />;
 }
 
-// The strip a bar sits on, with faint lines at each tick of the time scale.
 function Track({ gridPercent, chosen, children }: { gridPercent: number; chosen: boolean; children?: ReactNode }) {
   const style: CSSProperties = {
     backgroundImage: `linear-gradient(90deg, ${chosen ? "#1b1a22" : "var(--color-grid)"} 1px, transparent 1px)`,
@@ -87,15 +85,19 @@ function StepRow({
       >
         <span className="flex min-w-0 items-center gap-2.25 overflow-hidden" style={{ paddingLeft: indent }}>
           <Marker step={step} />
-          {/* The name keeps its width; when space runs out, the argument
-              next to it is the part that gets shortened. */}
           <span
             className={`max-w-[70%] shrink-0 truncate ${isTool ? "font-mono text-xs text-fg-soft" : ""} ${chosen && !isTool ? "font-semibold" : ""}`}
           >
             {row.label}
           </span>
-          {/* "error" comes before the argument, so it's never the part cut off. */}
-          {!step.ok && <span className="shrink-0 text-[11.5px] text-bad">error</span>}
+          {row.tags.map((tag) => (
+            <span
+              key={tag.text}
+              className={`shrink-0 text-[11.5px] ${tag.severity === "error" ? "text-bad" : "text-warn-dim"}`}
+            >
+              {tag.text}
+            </span>
+          ))}
           {row.detail && <span className="min-w-0 truncate font-mono text-xs text-muted">{row.detail}</span>}
           {step.tokens !== null && (
             <span className="hidden shrink-0 text-[11.5px] text-muted sm:inline">{shortTokens(step.tokens)}</span>
@@ -136,7 +138,6 @@ function StepRow({
 
 export function Waterfall({ rows, axis, chosenId, onChoose, runError }: WaterfallProps) {
   const steps = rows.map((row) => row.step);
-  // The buttons in order, Run row first, so the arrow keys can move between them.
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
   const order: (string | null)[] = [null, ...steps.map((step) => step.id)];
 
@@ -157,7 +158,6 @@ export function Waterfall({ rows, axis, chosenId, onChoose, runError }: Waterfal
       <div className={`${ROW_GRID} border-b border-line px-4 py-2.5 text-[11.5px] text-muted tabular-nums`}>
         <span>{countLabel(rows.length, "step")}</span>
         <span className="relative h-4" aria-hidden="true">
-          {/* Phones only have room for the start and the total. */}
           {axis.ticks.map((tick, index) => (
             <span
               key={tick.label}

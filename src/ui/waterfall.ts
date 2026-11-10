@@ -1,7 +1,9 @@
 import { formatDuration } from "../lib/format";
 import { depthOf } from "../recorder/tree";
 import type { Run, Step } from "../recorder/types";
+import type { Flag } from "../flags/types";
 import { readToolUseFailure, wholeStepError } from "./errors";
+import { stepTags, type Tag } from "./flags";
 
 
 const MIN_BAR_PERCENT = 0.6;
@@ -29,6 +31,7 @@ export interface WaterfallRow {
   depth: number;
   label: string;
   detail: string | null;
+  tags: Tag[]; // "error", "slow" and the like, after the name
   bar: Bar;
 }
 
@@ -128,7 +131,7 @@ export function stepNote(step: Step, steps: Step[], runError: string | null): { 
   }
 }
 
-export function buildRows(run: Run, totalMs: number): WaterfallRow[] {
+export function buildRows(run: Run, totalMs: number, flags: Flag[]): WaterfallRow[] {
   const stepsById = new Map(run.steps.map((step) => [step.id, step]));
 
   return run.steps.map((step, index) => ({
@@ -137,6 +140,7 @@ export function buildRows(run: Run, totalMs: number): WaterfallRow[] {
     depth: depthOf(step, stepsById),
     label: stepLabel(step, run.steps),
     detail: step.type === "tool" ? toolDetail(step.input) : null,
+    tags: stepTags(step, flags),
     bar: barFor(step.startMs, step.durationMs, totalMs),
   }));
 }

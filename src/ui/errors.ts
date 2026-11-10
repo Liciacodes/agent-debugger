@@ -13,8 +13,13 @@ export interface ToolArgument {
   value: string; // text keeps its line breaks; anything else is spaced-out JSON
 }
 
+// Why Groq said no: a tool the model doesn't have, a call that wasn't valid
+// JSON, or something else.
+export type ToolUseReason = "unknown_tool" | "invalid_json" | "rejected";
+
 // Groq turning down a tool call the model made, in plain words.
 export interface ToolUseFailure {
+  reason: ToolUseReason;
   summary: string;
   tool: string | null;
   // The arguments one by one, when what the model sent could be read.
@@ -73,14 +78,17 @@ function readAttempt(generation: string): Attempt {
   return { tool: call.name, args: readArguments(args), sent: null, validJson: true };
 }
 
-function summaryFor(tool: string | null, toolIsUnknown: boolean, validJson: boolean): string {
-  if (toolIsUnknown && tool) return `The model tried to call ${tool}, a tool it doesn't have.`;
-  if (!validJson) {
-    return tool
-      ? `The model tried to call ${tool}, but what it sent wasn't valid JSON.`
-      : "The model sent a tool call that wasn't valid JSON.";
+function summaryFor(reason: ToolUseReason, tool: string | null): string {
+  switch (reason) {
+    case "unknown_tool":
+      return `The model tried to call ${tool}, a tool it doesn't have.`;
+    case "invalid_json":
+      return tool
+        ? `The model tried to call ${tool}, but what it sent wasn't valid JSON.`
+        : "The model sent a tool call that wasn't valid JSON.";
+    case "rejected":
+      return tool ? `Groq rejected the model's call to ${tool}.` : "Groq rejected the model's tool call.";
   }
-  return tool ? `Groq rejected the model's call to ${tool}.` : "Groq rejected the model's tool call.";
 }
 
 // Reads Groq's tool_use_failed error. Any other error, or one cut short, gives
@@ -94,9 +102,12 @@ export function readToolUseFailure(error: string): ToolUseFailure | null {
   const unknownTool = typeof message === "string" ? (UNKNOWN_TOOL.exec(message)?.[1] ?? null) : null;
   const attempt = typeof generation === "string" ? readAttempt(generation) : null;
   const tool = unknownTool ?? attempt?.tool ?? null;
+  const reason: ToolUseReason =
+    unknownTool !== null ? "unknown_tool" : attempt?.validJson === false ? "invalid_json" : "rejected";
 
   return {
-    summary: summaryFor(tool, unknownTool !== null, attempt?.validJson ?? true),
+    reason,
+    summary: summaryFor(reason, tool),
     tool,
     args: attempt?.args ?? null,
     sent: attempt?.sent ?? null,

@@ -42,6 +42,11 @@
   --color-bad-edge: #3a1d22;
   --color-warn: #e9b949;
   --color-warn-soft: #f2cf78; /* also inline code in text, like run_tests in the design */
+  --color-warn-dim: #c9a44a; /* warning words on a timeline row, like "never called" */
+  /* The design has no yellow pill, so these are made the way bad-tint and
+     bad-edge are for the red one. */
+  --color-warn-tint: #1a160f;
+  --color-warn-edge: #3e3219;
 }
 
 /* Thin scrollbars in the theme's colours, instead of the system's light ones.

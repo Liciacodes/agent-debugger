@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { trimText } from "../recorder/recorder";
+import type { Flag } from "../flags/types";
 import type { Run, Step } from "../recorder/types";
 import { barFor, buildRows, stepLabel, stepNote, timeAxis, toolDetail } from "./waterfall";
 
@@ -141,7 +142,7 @@ describe("stepNote", () => {
 
 describe("buildRows", () => {
   it("numbers the steps and indents tools under their model call", () => {
-    const rows = buildRows(run, 1930);
+    const rows = buildRows(run, 1930, []);
 
     expect(rows.map((row) => [row.number, row.depth, row.label, row.detail])).toEqual([
       [1, 0, "Plan next step", null],
@@ -149,5 +150,12 @@ describe("buildRows", () => {
       [3, 0, "Decide", null],
       [4, 0, "Answer", null],
     ]);
+  });
+
+  it("puts each step's flags on its row", () => {
+    const slow: Flag = { kind: "slow_step", severity: "warning", stepId: "s3", tool: null, message: "" };
+    const rows = buildRows(run, 1930, [slow]);
+
+    expect(rows.map((row) => row.tags)).toEqual([[], [], [{ text: "slow", severity: "warning" }], []]);
   });
 });

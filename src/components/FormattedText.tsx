@@ -8,7 +8,7 @@ function Pieces({ pieces }: { pieces: MarkdownPiece[] }) {
         return <Fragment key={index}>{piece.text}</Fragment>;
       case "code":
         return (
-          <code key={index} className="text-warn-soft">
+          <code key={index} className="font-mono text-xs text-warn-soft">
             {piece.text}
           </code>
         );

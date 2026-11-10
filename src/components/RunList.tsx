@@ -10,9 +10,15 @@ import { StatusIcon } from "./StatusIcon";
 
 export interface RunListItem extends RunSummary {
   ago: string; // "2m", worked out on the server
+  slow: boolean; // one step took most of the run's time
 }
 
-type Filter = "all" | "failed";
+type Filter = "all" | "failed" | "slow";
+
+const EMPTY_MESSAGES: Record<Exclude<Filter, "all">, string> = {
+  failed: "No failed runs.",
+  slow: "No slow runs.",
+};
 
 function useRefreshOnReturn() {
   const router = useRouter();
@@ -57,10 +63,11 @@ export function RunList({ items, todayCount }: { items: RunListItem[]; todayCoun
   const [filter, setFilter] = useState<Filter>("all");
   useRefreshOnReturn();
 
-  // "Failed" means the run stopped without an answer. Later, the automatic
-  // flags will add answered runs that broke a rule.
+  // "Failed" means the run stopped without an answer, so it matches the red
+  // icons. "Slow" means one step took most of the run's time.
   const failed = items.filter((item) => runState(item.status) === "stopped");
-  const shown = filter === "failed" ? failed : items;
+  const slow = items.filter((item) => item.slow);
+  const shown = filter === "failed" ? failed : filter === "slow" ? slow : items;
 
   return (
     <>
@@ -72,6 +79,9 @@ export function RunList({ items, todayCount }: { items: RunListItem[]; todayCoun
         <FilterChip active={filter === "failed"} onClick={() => setFilter("failed")}>
           Failed · {failed.length}
         </FilterChip>
+        <FilterChip active={filter === "slow"} onClick={() => setFilter("slow")}>
+          Slow · {slow.length}
+        </FilterChip>
       </div>
 
       {shown.length === 0 ? (
@@ -81,8 +91,8 @@ export function RunList({ items, todayCount }: { items: RunListItem[]; todayCoun
               No runs yet. With the server running, try{" "}
               <code className="font-mono text-xs text-fg-soft">npm run agent -- &quot;your question&quot;</code>
             </>
-          ) : (
-            "No failed runs."
+          ) : filter === "all" ? null : (
+            EMPTY_MESSAGES[filter]
           )}
         </p>
       ) : (
@@ -104,6 +114,7 @@ export function RunList({ items, todayCount }: { items: RunListItem[]; todayCoun
                     <span className={`line-clamp-2 leading-[1.35] ${open ? "font-medium" : ""}`}>{item.question}</span>
                     <span className="text-[11.5px] text-muted">
                       {formatDuration(item.durationMs)} · {countLabel(item.stepCount, "step")}
+                      {item.slow && " · slow"}
                     </span>
                   </span>
                   <span className="text-[11.5px] text-muted">{item.ago}</span>

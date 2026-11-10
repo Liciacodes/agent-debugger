@@ -20,6 +20,7 @@ function groqError(message: string, generation?: string): string {
 describe("readToolUseFailure", () => {
   it("explains a call to a tool the model doesn't have", () => {
     expect(readToolUseFailure(REAL_ERROR)).toEqual({
+      reason: "unknown_tool",
       summary: "The model tried to call write_file, a tool it doesn't have.",
       tool: "write_file",
       args: [
@@ -46,6 +47,7 @@ describe("readToolUseFailure", () => {
   it("explains arguments that aren't valid JSON, and keeps them as written", () => {
     const generation = JSON.stringify({ name: "read_file", arguments: '{"path": "src/cart.ts"' });
     expect(readToolUseFailure(groqError("Failed to parse tool call arguments", generation))).toEqual({
+      reason: "invalid_json",
       summary: "The model tried to call read_file, but what it sent wasn't valid JSON.",
       tool: "read_file",
       args: null,
@@ -56,6 +58,7 @@ describe("readToolUseFailure", () => {
   it("still finds the tool's name when the whole call is broken JSON", () => {
     const generation = '{"name": "read_file", "arguments": {"path": "src/cart.ts"\n}';
     expect(readToolUseFailure(groqError("Failed to parse tool call", generation))).toEqual({
+      reason: "invalid_json",
       summary: "The model tried to call read_file, but what it sent wasn't valid JSON.",
       tool: "read_file",
       args: null,
@@ -71,13 +74,14 @@ describe("readToolUseFailure", () => {
 
   it("has a general message for other refusals", () => {
     const generation = JSON.stringify({ name: "read_file", arguments: {} });
-    expect(readToolUseFailure(groqError("parameters for tool read_file did not match schema", generation))?.summary).toBe(
-      "Groq rejected the model's call to read_file.",
-    );
+    const failure = readToolUseFailure(groqError("parameters for tool read_file did not match schema", generation));
+    expect(failure?.reason).toBe("rejected");
+    expect(failure?.summary).toBe("Groq rejected the model's call to read_file.");
   });
 
   it("uses the name in Groq's message when it didn't say what the model sent", () => {
     expect(readToolUseFailure(groqError(UNKNOWN_TOOL_MESSAGE))).toEqual({
+      reason: "unknown_tool",
       summary: "The model tried to call write_file, a tool it doesn't have.",
       tool: "write_file",
       args: null,

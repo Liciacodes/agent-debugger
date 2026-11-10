@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import { formatDuration } from "@/lib/format";
+import { findFlags } from "@/flags/find-flags";
 import { computeTotals } from "@/recorder/totals";
 import type { Run } from "@/recorder/types";
 import { readToolUseFailure } from "@/ui/errors";
+import { explainsError } from "@/ui/flags";
 import { fullTokens, statusLabel } from "@/ui/labels";
 import { buildRows, timeAxis } from "@/ui/waterfall";
+import { FlagPills } from "./Flags";
 import { RawView } from "./RawView";
 import { StatusBadge } from "./StatusIcon";
 import { RunOverview, StepDetails } from "./StepDetails";
@@ -48,7 +51,8 @@ function ViewSwitch({ value, onChange }: { value: View; onChange: (view: View) =
 
 export function RunView({ run, stepFromUrl }: { run: Run; stepFromUrl: string | null }) {
   const totals = computeTotals(run);
-  const rows = buildRows(run, totals.durationMs);
+  const flags = findFlags(run);
+  const rows = buildRows(run, totals.durationMs, flags);
   const axis = timeAxis(totals.durationMs);
   const [chosenId, setChosenId] = useState(() => startingStep(run, stepFromUrl));
   const [view, setView] = useState<View>("timeline");
@@ -83,9 +87,11 @@ export function RunView({ run, stepFromUrl }: { run: Run; stepFromUrl: string | 
           <ViewSwitch value={view} onChange={setView} />
         </div>
 
-        {/* Only the plain sentence for a Groq tool error; the details panel
-            has the rest. */}
-        {run.error && (
+        <FlagPills flags={flags} onChoose={choose} />
+
+        {/* Only for an error no flag explains, since the pills and "What went
+            wrong" already say it. A Groq tool error shows its plain sentence. */}
+        {run.error && !explainsError(flags) && (
           <p role="status" className="rounded-[10px] border border-bad-edge bg-bad-tint px-3.5 py-2.5 leading-relaxed text-bad-soft">
             {readToolUseFailure(run.error)?.summary ?? run.error}
           </p>
@@ -102,7 +108,15 @@ export function RunView({ run, stepFromUrl }: { run: Run; stepFromUrl: string | 
         aria-label="Details"
         className="scrollbar-dark w-full border-t border-line bg-side px-4 py-6 sm:px-5.5 xl:w-95 xl:shrink-0 xl:overflow-y-auto xl:border-t-0 xl:border-l"
       >
-        {chosenRow ? <StepDetails row={chosenRow} runError={run.error} /> : <RunOverview run={run} totals={totals} />}
+        {chosenRow ? (
+          <StepDetails
+            row={chosenRow}
+            runError={run.error}
+            flags={flags.filter((flag) => flag.stepId === chosenRow.step.id)}
+          />
+        ) : (
+          <RunOverview run={run} totals={totals} flags={flags.filter((flag) => flag.stepId === null)} />
+        )}
       </aside>
     </>
   );

@@ -1,10 +1,13 @@
 import type { ReactNode } from "react";
+import type { Flag } from "@/flags/types";
 import { formatDuration } from "@/lib/format";
 import type { RunTotals } from "@/recorder/totals";
 import type { Run } from "@/recorder/types";
 import { readToolUseFailure, type ToolUseFailure, wholeStepError } from "@/ui/errors";
+import { explainsError } from "@/ui/flags";
 import { fullTokens, statusLabel } from "@/ui/labels";
 import { stepKind, type WaterfallRow } from "@/ui/waterfall";
+import { WhatWentWrong } from "./Flags";
 import { FormattedText } from "./FormattedText";
 
 // The box every block of saved text sits in. Each use adds its colours.
@@ -107,35 +110,40 @@ function ToolAttempt({ failure }: { failure: ToolUseFailure }) {
 
 // Groq's tool_use_failed error is a wall of JSON, so it's explained in one
 // sentence, with the details folded away. Other errors are shown as they are.
-function ErrorBlock({ text }: { text: string }) {
+// When "What went wrong" above already says it (`explained`), only the folded
+// details are left.
+function ErrorBlock({ text, explained }: { text: string; explained: boolean }) {
   const failure = readToolUseFailure(text);
-  if (!failure) return <TextBlock title="Error" text={text} tone="bad" />;
+  if (!failure && !explained) return <TextBlock title="Error" text={text} tone="bad" />;
 
   return (
     <section className="flex flex-col gap-2">
       <h3 className="text-xs text-muted">Error</h3>
-      <p className="rounded-[10px] border border-bad-edge bg-bad-tint px-3 py-2.5 leading-relaxed text-bad-soft">
-        {failure.summary}
-      </p>
-      {(failure.args !== null || failure.sent !== null) && (
+      {failure && !explained && (
+        <p className="rounded-[10px] border border-bad-edge bg-bad-tint px-3 py-2.5 leading-relaxed text-bad-soft">
+          {failure.summary}
+        </p>
+      )}
+      {failure && (failure.args !== null || failure.sent !== null) && (
         <Fold title="What it tried to send">
           <ToolAttempt failure={failure} />
         </Fold>
       )}
-      <Fold title="Full error from Groq">
+      <Fold title={failure ? "Full error from Groq" : "Full error"}>
         <pre className={`${TEXT_BOX} border-bad-edge bg-bad-tint text-bad-soft`}>{text}</pre>
       </Fold>
     </section>
   );
 }
 
-export function StepDetails({ row, runError }: { row: WaterfallRow; runError: string | null }) {
+export function StepDetails({ row, runError, flags }: { row: WaterfallRow; runError: string | null; flags: Flag[] }) {
   const { step } = row;
   const error = wholeStepError(step.error, runError);
 
   return (
     <div className="flex flex-col gap-5">
       <Heading kicker={`Step ${row.number} · ${stepKind(step)}`} title={row.label} />
+      <WhatWentWrong flags={flags} />
 
       <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
         <Fact label="Started at">{formatDuration(step.startMs)}</Fact>
@@ -149,7 +157,7 @@ export function StepDetails({ row, runError }: { row: WaterfallRow; runError: st
         </Fact>
       </dl>
 
-      {error && <ErrorBlock text={error} />}
+      {error && <ErrorBlock text={error} explained={explainsError(flags)} />}
       {step.input && (
         <TextBlock
           title={step.type === "tool" ? "Arguments" : "Input (what was new to the model)"}
@@ -167,10 +175,11 @@ export function StepDetails({ row, runError }: { row: WaterfallRow; runError: st
 }
 
 // Shown when the Run row is chosen: the whole run at a glance.
-export function RunOverview({ run, totals }: { run: Run; totals: RunTotals }) {
+export function RunOverview({ run, totals, flags }: { run: Run; totals: RunTotals; flags: Flag[] }) {
   return (
     <div className="flex flex-col gap-5">
       <Heading kicker={`Run · ${run.id}`} title="Overview" />
+      <WhatWentWrong flags={flags} />
 
       <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
         <Fact label="Status">{statusLabel(run.status)}</Fact>
@@ -192,7 +201,7 @@ export function RunOverview({ run, totals }: { run: Run; totals: RunTotals }) {
       </dl>
 
       {run.answer !== null && <TextBlock title="Answer" text={run.answer} markdown />}
-      {run.error !== null && <ErrorBlock text={run.error} />}
+      {run.error !== null && <ErrorBlock text={run.error} explained={explainsError(flags)} />}
       <p className="text-xs leading-relaxed text-muted">Pick a step in the timeline to see everything about it.</p>
     </div>
   );
