@@ -1,8 +1,12 @@
 import Link from "next/link";
+import { isDemo } from "@/lib/demo";
 
 // The top bar. The search, the tests count and "Run all" from the design stay
-// hidden until those features exist.
+// hidden until those features exist. On the public demo, the "local" tag
+// becomes "demo" with a quiet note beside it.
 export function AppHeader() {
+  const demo = isDemo();
+
   return (
     <header className="flex h-13 shrink-0 items-center gap-2.5 border-b border-line px-4">
       <Link
@@ -19,7 +23,10 @@ export function AppHeader() {
       <span className="text-quiet" aria-hidden="true">/</span>
     
       <span className="text-fg-dim">code-helper</span>
-      <span className="rounded-[5px] border border-edge-strong bg-raised px-1.75 py-0.5 text-[11px] text-muted">local</span>
+      <span className="rounded-[5px] border border-edge-strong bg-raised px-1.75 py-0.5 text-[11px] text-muted">
+        {demo ? "demo" : "local"}
+      </span>
+      {demo && <span className="min-w-0 truncate text-xs text-muted">Showing recorded runs</span>}
     </header>
   );
 }

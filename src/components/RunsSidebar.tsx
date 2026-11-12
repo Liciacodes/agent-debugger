@@ -1,5 +1,6 @@
 import { connection } from "next/server";
 import { slowSteps } from "@/flags/rules";
+import { isDemo } from "@/lib/demo";
 import type { Run } from "@/recorder/types";
 import { prismaStore } from "@/server/prisma-store";
 import { RUN_LIST_LIMIT, toSummary } from "@/server/runs-api";
@@ -32,5 +33,5 @@ export async function RunsSidebar() {
   }));
   const todayCount = runs.filter((run) => isSameDay(run.startedAt, now)).length;
 
-  return <RunList items={items} todayCount={todayCount} />;
+  return <RunList items={items} todayCount={todayCount} demo={isDemo()} />;
 }

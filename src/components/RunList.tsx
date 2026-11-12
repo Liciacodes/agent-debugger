@@ -58,7 +58,7 @@ function ListHeading({ todayCount }: { todayCount?: number }) {
   );
 }
 
-export function RunList({ items, todayCount }: { items: RunListItem[]; todayCount: number }) {
+export function RunList({ items, todayCount, demo }: { items: RunListItem[]; todayCount: number; demo: boolean }) {
   const { id: openId } = useParams<{ id?: string }>();
   const [filter, setFilter] = useState<Filter>("all");
   useRefreshOnReturn();
@@ -86,7 +86,9 @@ export function RunList({ items, todayCount }: { items: RunListItem[]; todayCoun
 
       {shown.length === 0 ? (
         <p className="px-1.5 leading-relaxed text-muted">
-          {items.length === 0 ? (
+          {items.length === 0 && demo ? (
+            "No recorded runs yet."
+          ) : items.length === 0 ? (
             <>
               No runs yet. With the server running, try{" "}
               <code className="font-mono text-xs text-fg-soft">npm run agent -- &quot;your question&quot;</code>
